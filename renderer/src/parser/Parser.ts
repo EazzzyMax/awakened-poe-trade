@@ -180,7 +180,9 @@ function normalizeName (item: ParserState) {
 
 function findInDatabase (item: ParserState) {
   let info: BaseType[] | undefined
-  if (item.category === ItemCategory.DivinationCard) {
+  if (item.info?.refName === 'Viscera') {
+    info = [item.info]
+  } else if (item.category === ItemCategory.DivinationCard) {
     info = ITEM_BY_TRANSLATED('DIVINATION_CARD', item.name)
   } else if (item.category === ItemCategory.CapturedBeast) {
     info = ITEM_BY_TRANSLATED('CAPTURED_BEAST', item.baseType ?? item.name)
@@ -831,6 +833,7 @@ function parseModifiers (section: string[], item: ParsedItem) {
   const recognizedLine = section.find(line =>
     line.endsWith(ENCHANT_LINE) ||
     line.endsWith(SCOURGE_LINE) ||
+    (item.info.refName === 'Viscera' && line.endsWith(IMPLICIT_LINE)) ||
     isModInfoLine(line)
   )
 
@@ -1006,7 +1009,7 @@ function parseCategoryByHelpText (section: string[], item: ParserState) {
     item.category = ItemCategory.Voidstone
     return 'SECTION_PARSED'
   } else if (section[0] === _$.VISCERA_HELP) {
-    item.name = 'Viscera'
+    item.info = { name: item.name, refName: 'Viscera', namespace: 'ITEM', icon: '' }
     return 'SECTION_PARSED'
   }
 
